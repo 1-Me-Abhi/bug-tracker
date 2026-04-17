@@ -6,8 +6,8 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="w-10 h-10 border-3 border-brand-500 border-t-transparent rounded-full animate-spin" />
+      <div style={{ minHeight: '100vh', background: 'var(--dark-900)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="spinner" />
       </div>
     );
   }

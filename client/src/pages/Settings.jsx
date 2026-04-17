@@ -1,52 +1,60 @@
-import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { HiOutlineUser, HiOutlineMail, HiOutlineShieldCheck } from 'react-icons/hi';
-import toast from 'react-hot-toast';
 
 const Settings = () => {
   const { user } = useAuth();
 
+  const infoRow = (icon, label, value) => (
+    <div
+      className="flex items-center gap-3"
+      style={{
+        padding: '14px 16px',
+        background: 'rgba(255,255,255,0.02)',
+        borderRadius: '8px',
+        border: '1px solid var(--border-light)',
+      }}
+    >
+      <div style={{ color: 'var(--dark-500)' }}>{icon}</div>
+      <div>
+        <p style={{ fontSize: '11px', color: 'var(--dark-400)', marginBottom: '2px' }}>{label}</p>
+        <p style={{ fontSize: '14px', color: 'var(--dark-200)', fontWeight: 500 }}>{value}</p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="p-6 max-w-2xl mx-auto animate-fade-in">
-      <h1 className="text-xl font-bold text-white mb-6">Settings</h1>
+    <div style={{ maxWidth: '560px', margin: '0 auto' }}>
+      <div className="card">
+        <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--dark-300)', marginBottom: '20px' }}>Profile</h2>
 
-      <div className="bg-dark-800/60 rounded-2xl border border-dark-600/30 p-6 space-y-6">
-        <h2 className="text-sm font-semibold text-white">Profile</h2>
-
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-400 to-accent-cyan flex items-center justify-center text-2xl font-bold text-dark-900">
-            {user?.name?.charAt(0).toUpperCase()}
+        {/* Avatar + Name */}
+        <div className="flex items-center gap-4" style={{ marginBottom: '24px' }}>
+          <div className="avatar avatar-lg">
+            {user?.name?.charAt(0)?.toUpperCase() ?? '?'}
           </div>
           <div>
-            <h3 className="text-base font-semibold text-white">{user?.name}</h3>
-            <p className="text-sm text-dark-300">{user?.email}</p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--dark-200)' }}>{user?.name}</h3>
+            <p style={{ fontSize: '13px', color: 'var(--dark-400)', marginTop: '2px' }}>{user?.email}</p>
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 px-4 py-3 bg-dark-700/50 rounded-xl">
-            <HiOutlineUser className="w-5 h-5 text-dark-400" />
-            <div>
-              <p className="text-xs text-dark-400">Full Name</p>
-              <p className="text-sm text-white">{user?.name}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 px-4 py-3 bg-dark-700/50 rounded-xl">
-            <HiOutlineMail className="w-5 h-5 text-dark-400" />
-            <div>
-              <p className="text-xs text-dark-400">Email</p>
-              <p className="text-sm text-white">{user?.email}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 px-4 py-3 bg-dark-700/50 rounded-xl">
-            <HiOutlineShieldCheck className="w-5 h-5 text-dark-400" />
-            <div>
-              <p className="text-xs text-dark-400">Role</p>
-              <p className="text-sm text-white capitalize">{user?.role}</p>
-            </div>
-          </div>
+        {/* Info rows */}
+        <div className="flex-col" style={{ display: 'flex', gap: '8px' }}>
+          {infoRow(
+            <HiOutlineUser style={{ width: '18px', height: '18px' }} />,
+            'Full Name',
+            user?.name
+          )}
+          {infoRow(
+            <HiOutlineMail style={{ width: '18px', height: '18px' }} />,
+            'Email',
+            user?.email
+          )}
+          {infoRow(
+            <HiOutlineShieldCheck style={{ width: '18px', height: '18px' }} />,
+            'Role',
+            <span style={{ textTransform: 'capitalize' }}>{user?.role}</span>
+          )}
         </div>
       </div>
     </div>

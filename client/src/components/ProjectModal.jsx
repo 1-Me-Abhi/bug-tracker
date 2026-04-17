@@ -19,7 +19,6 @@ const ProjectModal = ({ isOpen, onClose, onSave, project = null }) => {
       toast.error('Name and key are required');
       return;
     }
-
     setLoading(true);
     try {
       let result;
@@ -39,69 +38,64 @@ const ProjectModal = ({ isOpen, onClose, onSave, project = null }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-dark-800 rounded-2xl border border-dark-600/50 shadow-2xl animate-scale-in">
-        <div className="flex items-center justify-between p-5 border-b border-dark-600/50">
-          <h2 className="text-lg font-semibold text-white">
+    <div className="modal-overlay">
+      <div className="modal-backdrop" onClick={onClose} />
+      <div className="modal-content" style={{ maxWidth: '440px' }}>
+        <div className="modal-header">
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--dark-200)' }}>
             {project ? 'Edit Project' : 'Create New Project'}
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-dark-400 hover:text-white hover:bg-dark-700 transition-colors">
-            <HiX className="w-5 h-5" />
+          <button onClick={onClose} className="btn-ghost">
+            <HiX style={{ width: '18px', height: '18px' }} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-dark-300 mb-1.5">Project Name *</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="e.g., Web Platform"
-              className="w-full px-3 py-2.5 bg-dark-700 border border-dark-600/50 rounded-lg text-sm text-white placeholder-dark-400 focus:border-brand-500/50"
-            />
-          </div>
-
-          {!project && (
+        <form onSubmit={handleSubmit} className="modal-body">
+          <div className="flex-col" style={{ display: 'flex', gap: '16px' }}>
             <div>
-              <label className="block text-xs font-medium text-dark-300 mb-1.5">Project Key *</label>
+              <label className="label">Project Name *</label>
               <input
-                type="text"
-                value={form.key}
-                onChange={(e) => setForm({ ...form, key: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
-                placeholder="e.g., WEB"
-                maxLength={10}
-                className="w-full px-3 py-2.5 bg-dark-700 border border-dark-600/50 rounded-lg text-sm text-white placeholder-dark-400 focus:border-brand-500/50 font-mono uppercase"
+                type="text" value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g., Web Platform"
+                className="input"
               />
-              <p className="text-[11px] text-dark-400 mt-1">Used as ticket prefix (e.g., WEB-1, WEB-2)</p>
             </div>
-          )}
 
-          <div>
-            <label className="block text-xs font-medium text-dark-300 mb-1.5">Description</label>
-            <textarea
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Brief project description..."
-              rows={3}
-              className="w-full px-3 py-2.5 bg-dark-700 border border-dark-600/50 rounded-lg text-sm text-white placeholder-dark-400 focus:border-brand-500/50 resize-none"
-            />
+            {!project && (
+              <div>
+                <label className="label">Project Key *</label>
+                <input
+                  type="text" value={form.key}
+                  onChange={(e) => setForm({ ...form, key: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
+                  placeholder="e.g., WEB" maxLength={10}
+                  className="input"
+                  style={{ fontFamily: 'monospace', textTransform: 'uppercase' }}
+                />
+                <p style={{ fontSize: '11px', color: 'var(--dark-350)', marginTop: '4px' }}>
+                  Used as ticket prefix (e.g., WEB-1, WEB-2)
+                </p>
+              </div>
+            )}
+
+            <div>
+              <label className="label">Description</label>
+              <textarea
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                placeholder="Brief project description..."
+                rows={3}
+                className="input"
+                style={{ resize: 'none' }}
+              />
+            </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 text-sm font-medium text-dark-300 hover:text-white rounded-lg hover:bg-dark-700 transition-colors"
-            >
+          <div className="modal-footer">
+            <button type="button" onClick={onClose} className="btn-text">
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg hover:from-brand-600 hover:to-brand-700 transition-all disabled:opacity-50 shadow-lg shadow-brand-500/25"
-            >
+            <button type="submit" disabled={loading} className="btn" style={{ opacity: loading ? 0.5 : 1 }}>
               {loading ? 'Saving...' : project ? 'Update' : 'Create Project'}
             </button>
           </div>

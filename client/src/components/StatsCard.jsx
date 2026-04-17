@@ -1,14 +1,33 @@
 const StatsCard = ({ icon: Icon, label, value }) => {
   return (
-    <div className="bg-[#06122d] rounded-lg border border-[#2b4680]/30 p-6 transition-all duration-300 hover:border-[#456067]">
+    <div
+      className="card transition-all"
+      style={{ padding: '24px' }}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-[#909fb6] uppercase tracking-wider">{label}</p>
-          <p className="text-3xl font-regular text-[#dee5ff] mt-2">{value}</p>
+          <p style={{
+            fontSize: '11px', fontWeight: 600, color: 'var(--dark-400)',
+            textTransform: 'uppercase', letterSpacing: '0.06em',
+          }}>
+            {label}
+          </p>
+          <p style={{
+            fontSize: '32px', fontWeight: 300, color: 'var(--dark-100)',
+            marginTop: '8px', lineHeight: 1,
+          }}>
+            {value}
+          </p>
         </div>
         {Icon && (
-          <div className="p-2.5 rounded bg-[#031d4b] text-[#afcbd4]">
-            <Icon className="w-5 h-5" />
+          <div
+            className="flex items-center justify-center"
+            style={{
+              padding: '10px', borderRadius: '10px',
+              background: 'var(--accent-hover)', color: 'var(--accent)',
+            }}
+          >
+            <Icon style={{ width: '20px', height: '20px' }} />
           </div>
         )}
       </div>

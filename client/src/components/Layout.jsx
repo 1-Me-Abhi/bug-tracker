@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { HiOutlineMenuAlt2, HiOutlineBell } from 'react-icons/hi';
+import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import Sidebar from './Sidebar';
 
 const pageTitles = {
@@ -14,39 +14,49 @@ const Layout = () => {
   const location = useLocation();
 
   const getTitle = () => {
-    if (location.pathname.startsWith('/project/')) return 'Project Overview';
+    if (location.pathname.startsWith('/project/')) return 'Project Board';
     if (location.pathname.startsWith('/issue/')) return 'Issue Details';
     return pageTitles[location.pathname] || 'Bug Tracker';
   };
 
   return (
-    <div className="min-h-screen bg-[#060e20] text-[#dee5ff] font-sans selection:bg-[#304b52]">
-      {/* Sidebar is always fixed, lg:translate-x-0 */}
+    <div className="flex h-screen w-full overflow-hidden" style={{ background: 'var(--dark-850)' }}>
+      {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main content area leaves margin for sidebar on lg screens */}
-      <div className="flex flex-col min-h-screen transition-all lg:ml-64">
-        {/* Top header */}
-        <header className="sticky top-0 z-30 h-16 bg-[#06122d]/90 backdrop-blur-md border-b border-[#2b4680] flex items-center px-6 gap-4">
+      {/* Main area */}
+      <div className="flex-col flex-1" style={{ display: 'flex', minWidth: 0, height: '100%' }}>
+        {/* Top bar */}
+        <header
+          className="flex items-center shrink-0"
+          style={{
+            height: '64px',
+            padding: '0 32px',
+            gap: '16px',
+            background: 'var(--dark-800)',
+            borderBottom: '1px solid var(--border)',
+            zIndex: 10,
+          }}
+        >
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-md text-[#909fb6] hover:text-[#afcbd4] hover:bg-[#031d4b] transition-colors lg:hidden"
+            className="btn-ghost mobile-only"
           >
-            <HiOutlineMenuAlt2 className="w-5 h-5" />
+            <HiOutlineMenuAlt2 style={{ width: '20px', height: '20px' }} />
           </button>
 
-          <h2 className="text-lg font-medium text-[#dee5ff] tracking-tight">{getTitle()}</h2>
+          <h2 style={{ color: 'var(--dark-200)', fontSize: '16px', fontWeight: 600, letterSpacing: '-0.01em' }}>
+            {getTitle()}
+          </h2>
 
           <div className="flex-1" />
-
-          <button className="relative p-2 rounded-md text-[#909fb6] hover:text-[#afcbd4] hover:bg-[#031d4b] transition-colors">
-            <HiOutlineBell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#ee7d77] rounded-full" />
-          </button>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+        <main
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+          style={{ padding: '32px', background: 'var(--dark-850)' }}
+        >
           <Outlet />
         </main>
       </div>

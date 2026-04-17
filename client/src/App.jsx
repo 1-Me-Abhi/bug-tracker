@@ -15,10 +15,10 @@ const App = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-3 border-brand-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-dark-400 text-sm">Loading...</p>
+      <div style={{ minHeight: '100vh', background: 'var(--dark-900)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="flex-col items-center" style={{ display: 'flex', gap: '12px' }}>
+          <div className="spinner" />
+          <p style={{ color: 'var(--dark-500)', fontSize: '14px' }}>Loading...</p>
         </div>
       </div>
     );

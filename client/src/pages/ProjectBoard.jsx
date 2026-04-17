@@ -43,40 +43,27 @@ const ProjectBoard = () => {
     }
   }, [id, filters]);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  // Socket.io real-time
   useEffect(() => {
     if (id) joinProject(id);
-    return () => {
-      if (id) leaveProject(id);
-    };
+    return () => { if (id) leaveProject(id); };
   }, [id]);
 
   useEffect(() => {
     if (!socket) return;
-
     const handleIssueCreated = (issue) => {
-      setIssues(prev => {
-        if (prev.find(i => i._id === issue._id)) return prev;
-        return [...prev, issue];
-      });
+      setIssues(prev => prev.find(i => i._id === issue._id) ? prev : [...prev, issue]);
     };
-
     const handleIssueUpdated = (issue) => {
       setIssues(prev => prev.map(i => i._id === issue._id ? issue : i));
     };
-
     const handleIssueDeleted = ({ id }) => {
       setIssues(prev => prev.filter(i => i._id !== id));
     };
-
     socket.on('issue-created', handleIssueCreated);
     socket.on('issue-updated', handleIssueUpdated);
     socket.on('issue-deleted', handleIssueDeleted);
-
     return () => {
       socket.off('issue-created', handleIssueCreated);
       socket.off('issue-updated', handleIssueUpdated);
@@ -84,39 +71,22 @@ const ProjectBoard = () => {
     };
   }, [socket]);
 
-  const getColumnIssues = (status) => {
-    return issues
-      .filter(i => i.status === status)
-      .sort((a, b) => a.order - b.order);
-  };
+  const getColumnIssues = (status) =>
+    issues.filter(i => i.status === status).sort((a, b) => a.order - b.order);
 
   const handleDragEnd = async (result) => {
     const { draggableId, source, destination } = result;
     if (!destination) return;
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
-
     const newStatus = destination.droppableId;
-    const issueId = draggableId;
-
-    // Optimistic update
-    setIssues(prev => {
-      const updated = prev.map(i => {
-        if (i._id === issueId) {
-          return { ...i, status: newStatus, order: destination.index };
-        }
-        return i;
-      });
-      return updated;
-    });
-
+    setIssues(prev => prev.map(i =>
+      i._id === draggableId ? { ...i, status: newStatus, order: destination.index } : i
+    ));
     try {
-      await api.updateIssueStatus(issueId, {
-        status: newStatus,
-        order: destination.index
-      });
+      await api.updateIssueStatus(draggableId, { status: newStatus, order: destination.index });
     } catch (error) {
       toast.error('Failed to update issue');
-      loadData(); // Revert
+      loadData();
     }
   };
 
@@ -124,7 +94,7 @@ const ProjectBoard = () => {
     if (editIssue) {
       setIssues(prev => prev.map(i => i._id === issue._id ? issue : i));
     } else {
-      setIssues(prev => [...prev, issue]);
+      setIssues(prev => prev.find(i => i._id === issue._id) ? prev : [...prev, issue]);
     }
     setEditIssue(null);
   };
@@ -142,80 +112,73 @@ const ProjectBoard = () => {
     }
   };
 
-  const handleIssueClick = (issue) => {
-    navigate(`/issue/${issue._id}`);
-  };
-
-  const handleAddIssue = (status) => {
-    setDefaultStatus(status);
-    setEditIssue(null);
-    setShowIssueModal(true);
-  };
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="w-10 h-10 border-3 border-brand-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center" style={{ height: '60vh' }}>
+        <div className="spinner" />
       </div>
     );
   }
 
   if (!project) {
     return (
-      <div className="text-center py-20">
-        <p className="text-dark-400">Project not found</p>
+      <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--dark-400)' }}>
+        Project not found
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)]">
+    <div className="flex-col" style={{ display: 'flex', height: 'calc(100vh - 128px)' }}>
       {/* Project header */}
-      <div className="px-6 pt-4 pb-3 space-y-3 shrink-0">
-        <div className="flex items-center justify-between">
+      <div className="shrink-0" style={{ marginBottom: '16px' }}>
+        <div className="flex items-center justify-between" style={{ marginBottom: '12px' }}>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/projects')}
-              className="p-1.5 rounded-lg text-dark-400 hover:text-white hover:bg-dark-700 transition-colors"
-            >
-              <HiOutlineArrowLeft className="w-4 h-4" />
+            <button onClick={() => navigate('/projects')} className="btn-ghost">
+              <HiOutlineArrowLeft style={{ width: '16px', height: '16px' }} />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-white">{project.name}</h1>
-                <span className="text-xs font-mono text-dark-400 bg-dark-700/60 px-2 py-0.5 rounded">{project.key}</span>
+                <h1 style={{ fontSize: '17px', fontWeight: 600, color: 'var(--dark-200)' }}>{project.name}</h1>
+                <span className="mono-tag">{project.key}</span>
               </div>
-              <p className="text-xs text-dark-400">{project.description}</p>
+              {project.description && (
+                <p style={{ fontSize: '12px', color: 'var(--dark-500)', marginTop: '2px' }}>{project.description}</p>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Member avatars */}
-            <div className="flex -space-x-2 mr-2">
+            <div className="flex" style={{ marginRight: '4px' }}>
               {project.members?.slice(0, 5).map((m, i) => (
                 <div
                   key={i}
-                  className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-400 to-accent-cyan flex items-center justify-center text-[10px] font-bold text-dark-900 border-2 border-dark-800"
+                  className="avatar-md avatar"
+                  style={{
+                    border: '2px solid var(--dark-850)',
+                    marginLeft: i > 0 ? '-6px' : '0',
+                  }}
                   title={m.user?.name}
                 >
-                  {m.user?.name?.charAt(0).toUpperCase()}
+                  {m.user?.name?.charAt(0)?.toUpperCase() ?? '?'}
                 </div>
               ))}
             </div>
 
             <button
               onClick={() => setShowAddMember(!showAddMember)}
-              className="p-2 rounded-lg text-dark-300 hover:text-brand-400 hover:bg-dark-700 transition-colors"
+              className="btn-ghost"
               title="Add member"
             >
-              <HiOutlineUserAdd className="w-4 h-4" />
+              <HiOutlineUserAdd style={{ width: '16px', height: '16px' }} />
             </button>
 
             <button
               onClick={() => { setDefaultStatus('todo'); setEditIssue(null); setShowIssueModal(true); }}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-500 transition-colors"
+              className="btn"
+              style={{ padding: '8px 14px' }}
             >
-              <HiOutlinePlus className="w-4 h-4" />
+              <HiOutlinePlus style={{ width: '14px', height: '14px' }} />
               Issue
             </button>
           </div>
@@ -223,15 +186,16 @@ const ProjectBoard = () => {
 
         {/* Add member form */}
         {showAddMember && (
-          <form onSubmit={handleAddMember} className="flex gap-2 animate-slide-up">
+          <form onSubmit={handleAddMember} className="flex gap-2 anim-slide-up" style={{ marginBottom: '12px' }}>
             <input
               type="email"
               value={memberEmail}
               onChange={(e) => setMemberEmail(e.target.value)}
               placeholder="Enter member email..."
-              className="flex-1 max-w-xs px-3 py-2 bg-dark-700 border border-dark-600/50 rounded-lg text-sm text-white placeholder-dark-400"
+              className="input"
+              style={{ flex: 1, maxWidth: '320px' }}
             />
-            <button type="submit" className="px-3 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-500">
+            <button type="submit" className="btn" style={{ padding: '8px 14px' }}>
               Add
             </button>
           </form>
@@ -242,24 +206,23 @@ const ProjectBoard = () => {
       </div>
 
       {/* Kanban board */}
-      <div className="flex-1 overflow-x-auto px-6 pb-6">
+      <div className="flex-1 overflow-x-auto" style={{ paddingBottom: '8px' }}>
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex gap-4 h-full min-w-max lg:min-w-0">
+          <div className="flex h-full" style={{ gap: '12px', minWidth: 'max-content' }}>
             {STATUSES.map(status => (
               <KanbanColumn
                 key={status}
                 status={status}
                 issues={getColumnIssues(status)}
                 projectKey={project.key}
-                onIssueClick={handleIssueClick}
-                onAddIssue={handleAddIssue}
+                onIssueClick={(issue) => navigate(`/issue/${issue._id}`)}
+                onAddIssue={(s) => { setDefaultStatus(s); setEditIssue(null); setShowIssueModal(true); }}
               />
             ))}
           </div>
         </DragDropContext>
       </div>
 
-      {/* Issue Modal */}
       <IssueModal
         isOpen={showIssueModal}
         onClose={() => { setShowIssueModal(false); setEditIssue(null); }}

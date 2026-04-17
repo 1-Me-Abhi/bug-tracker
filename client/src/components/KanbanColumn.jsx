@@ -3,31 +3,41 @@ import IssueCard from './IssueCard';
 import { HiOutlinePlus } from 'react-icons/hi';
 
 const statusConfig = {
-  todo: { label: 'To Do', dotColor: 'bg-status-todo' },
-  in_progress: { label: 'In Progress', dotColor: 'bg-status-progress' },
-  in_review: { label: 'In Review', dotColor: 'bg-status-review' },
-  done: { label: 'Done', dotColor: 'bg-status-done' },
+  todo: { label: 'To Do', color: '#7a8ba5' },
+  in_progress: { label: 'In Progress', color: '#7ec8d8' },
+  in_review: { label: 'In Review', color: '#a8b4c8' },
+  done: { label: 'Done', color: '#34d399' },
 };
 
 const KanbanColumn = ({ status, issues, projectKey, onIssueClick, onAddIssue }) => {
-  const config = statusConfig[status] || { label: status, dotColor: 'bg-dark-400' };
+  const config = statusConfig[status] || { label: status, color: '#7a8ba5' };
 
   return (
-    <div className="flex flex-col min-w-[280px] w-[280px] lg:w-auto lg:flex-1 bg-dark-800/50 rounded-2xl border border-dark-600/30">
+    <div className="kanban-col">
       {/* Column header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-dark-600/30">
+      <div className="kanban-col-header">
         <div className="flex items-center gap-2">
-          <div className={`w-2.5 h-2.5 rounded-full ${config.dotColor}`} />
-          <h3 className="text-sm font-semibold text-dark-100">{config.label}</h3>
-          <span className="text-xs text-dark-400 bg-dark-700 px-1.5 py-0.5 rounded-md font-medium">
+          <div style={{
+            width: '8px', height: '8px',
+            borderRadius: '50%',
+            background: config.color,
+          }} />
+          <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--dark-200)' }}>{config.label}</h3>
+          <span style={{
+            fontSize: '11px', color: 'var(--dark-500)',
+            background: 'rgba(255,255,255,0.04)',
+            padding: '1px 6px', borderRadius: '4px',
+            fontWeight: 500,
+          }}>
             {issues.length}
           </span>
         </div>
         <button
           onClick={() => onAddIssue && onAddIssue(status)}
-          className="p-1 rounded-md text-dark-400 hover:text-brand-400 hover:bg-dark-700 transition-colors"
+          className="btn-ghost"
+          style={{ padding: '4px' }}
         >
-          <HiOutlinePlus className="w-4 h-4" />
+          <HiOutlinePlus style={{ width: '14px', height: '14px' }} />
         </button>
       </div>
 
@@ -37,11 +47,10 @@ const KanbanColumn = ({ status, issues, projectKey, onIssueClick, onAddIssue }) 
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`
-              flex-1 p-2 space-y-2 overflow-y-auto min-h-[200px]
-              transition-colors duration-200
-              ${snapshot.isDraggingOver ? 'bg-brand-500/5' : ''}
-            `}
+            className="kanban-col-body"
+            style={{
+              background: snapshot.isDraggingOver ? 'rgba(126,200,216,0.03)' : 'transparent',
+            }}
           >
             {issues.map((issue, index) => (
               <IssueCard
