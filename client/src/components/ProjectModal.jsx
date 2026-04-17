@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HiX } from 'react-icons/hi';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -10,6 +10,16 @@ const ProjectModal = ({ isOpen, onClose, onSave, project = null }) => {
     key: project?.key || '',
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setForm({
+        name: project?.name || '',
+        description: project?.description || '',
+        key: project?.key || '',
+      });
+    }
+  }, [isOpen, project]);
 
   if (!isOpen) return null;
 
